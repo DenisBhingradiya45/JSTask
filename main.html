@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+
+    <style>
+
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <form action="" id="formm">
+            <div class="mb-3">
+                <label for="id_username" class="form-label">Username</label>
+                <input type="text" class="form-control reset" id="id_username" name="username" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="id_firstname" class="form-label">Firstname</label>
+                <input type="text" class="form-control reset" id="id_firstname" name="firstname" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="id_lastname" class="form-label">Lastname</label>
+                <input type="text" class="form-control reset" id="id_lastname" name="lastname" required>
+            </div>
+
+            <div class="mb-3" id="hobby_value">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="hobby" id="id_hobby_1" value="sports">
+                    <label class="form-check-label" for="id_hobby_1">Sports</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="hobby" id="id_hobby_2" value="music">
+                    <label class="form-check-label" for="id_hobby_2">Music</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="hobby" id="id_hobby_3" value="reading">
+                    <label class="form-check-label" for="id_hobby_3">Reading</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="hobby" id="id_hobby_4" value="other">
+                    <label class="form-check-label" for="id_hobby_4">Other</label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="dropdown">
+                    <div class="mb-3">
+                        <select id="TechnologyDropdown" onchange="showOptions()" required>
+                            <option value="">Select Technology</option>
+                            <option value="frontend">Frontend</option>
+                            <option value="backend">Backend</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <select id="frameworkDropdown" style="display: none;">
+                            <option value="">Select Framework</option>
+                            <option value="reactjs">ReactJS</option>
+                            <option value="angularjs">AngularJS</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <select id="languageDropdown" style="display: none;">
+                            <option value="">Select Language</option>
+                            <option value="python">Python</option>
+                            <option value="java">Java</option>
+                            <option value="php">PHP</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <button type="button" class="btn btn-success" onclick="showData()">Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="table" class="container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Firstname</th>
+                    <th>Lastname</th>
+                    <th>Hobby</th>
+                    <th>Technology</th>
+                    <th>Preferred Language</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function showOptions() {
+            var TechnologyDropdown = document.getElementById("TechnologyDropdown");
+            var frameworkDropdown = document.getElementById("frameworkDropdown");
+            var languageDropdown = document.getElementById("languageDropdown");
+
+            var selectedTechnology = TechnologyDropdown.value;
+
+            frameworkDropdown.style.display = selectedTechnology === "frontend" ? "block" : "none";
+            languageDropdown.style.display = selectedTechnology === "backend" ? "block" : "none";
+        }
+
+        function showData() {
+            var form = document.getElementById("formm");
+
+            if (form.checkValidity() && validateHobbies()) {
+                var username = form.querySelector('#id_username').value;
+                var firstname = form.querySelector('#id_firstname').value;
+                var lastname = form.querySelector('#id_lastname').value;
+                var hobbyCheckboxes = form.querySelectorAll('input[name="hobby"]:checked');
+                var hobbies = Array.from(hobbyCheckboxes).map(function (checkbox) {
+                    return checkbox.value;
+                }).join(', ');
+                var Technology = form.querySelector('#TechnologyDropdown').value;
+                var framework = form.querySelector('#frameworkDropdown').value;
+                var language = form.querySelector('#languageDropdown').value;
+                var preferredLanguage = framework ? framework : language;
+
+                var html = `<tr>
+                    <td>${username}</td>
+                    <td>${firstname}</td>
+                    <td>${lastname}</td>
+                    <td>${hobbies}</td>
+                    <td>${Technology}</td>
+                    <td>${preferredLanguage}</td>
+                    <td><button onclick="onEdit(this)">Edit</button></td>
+                    <td><button onclick="onDelete(this)">Delete</button></td>
+                </tr>`;
+
+                var tableBody = document.getElementById('table-body');
+                tableBody.insertAdjacentHTML('beforeend', html);
+
+                form.reset();
+            } else {
+                form.reportValidity();
+            }
+            function validateHobbies() {
+                var checkedHobbies = form.querySelectorAll('input[name="hobby"]:checked');
+                if (checkedHobbies.length === 0) {
+                    alert("Please select at least one hobby.");
+                    return false;
+                }
+                return true;
+            }
+        }
+
+
+        function onEdit(button) {
+            var row = button.parentNode.parentNode;
+            var cells = row.getElementsByTagName("td");
+
+            var username = cells[0].innerText;
+            var firstname = cells[1].innerText;
+            var lastname = cells[2].innerText;
+            var hobbies = cells[3].innerText.split(', ');
+            var technology = cells[4].innerText;
+            var preferredLanguage = cells[5].innerText;
+
+            var form = document.getElementById("formm");
+            form.querySelector("#id_username").value = username;
+            form.querySelector("#id_firstname").value = firstname;
+            form.querySelector("#id_lastname").value = lastname;
+
+            var hobbyCheckboxes = form.querySelectorAll('input[name="hobby"]');
+            hobbyCheckboxes.forEach(function (checkbox) {
+                checkbox.checked = hobbies.includes(checkbox.value);
+            });
+
+            form.querySelector("#TechnologyDropdown").value = technology;
+            showOptions();
+
+            if (technology === "frontend") {
+                form.querySelector("#frameworkDropdown").value = preferredLanguage;
+            } else if (technology === "backend") {
+                form.querySelector("#languageDropdown").value = preferredLanguage;
+            }
+
+            var submitButton = form.querySelector('button[type="button"]');
+            submitButton.innerHTML = "Update";
+            submitButton.onclick = function () {
+                if (form.checkValidity() && validateHobbies()) {
+                    var updatedUsername = form.querySelector('#id_username').value;
+                    var updatedFirstname = form.querySelector('#id_firstname').value;
+                    var updatedLastname = form.querySelector('#id_lastname').value;
+                    var updatedHobbies = Array.from(form.querySelectorAll('input[name="hobby"]:checked')).map(function (checkbox) {
+                        return checkbox.value;
+                    }).join(', ');
+                    var updatedTechnology = form.querySelector('#TechnologyDropdown').value;
+                    var updatedFramework = form.querySelector('#frameworkDropdown').value;
+                    var updatedLanguage = form.querySelector('#languageDropdown').value;
+                    var updatedPreferredLanguage = updatedFramework ? updatedFramework : updatedLanguage;
+
+                    cells[0].innerText = updatedUsername;
+                    cells[1].innerText = updatedFirstname;
+                    cells[2].innerText = updatedLastname;
+                    cells[3].innerText = updatedHobbies;
+                    cells[4].innerText = updatedTechnology;
+                    cells[5].innerText = updatedPreferredLanguage;
+
+                    submitButton.innerHTML = "Submit";
+                    submitButton.onclick = showData;
+
+                    form.reset();
+                } else {
+                    form.reportValidity();
+                }
+            };
+
+            function validateHobbies() {
+                var checkedHobbies = form.querySelectorAll('input[name="hobby"]:checked');
+                if (checkedHobbies.length === 0) {
+                    alert("Please select at least one hobby.");
+                    return false;
+                }
+                return true;
+            }
+        }
+
+
+
+        function onDelete(button) {
+            var row = button.parentNode.parentNode;
+            var confirmm = confirm("Are you sure??");
+            if (confirmm) {
+                row.remove();
+            }
+        }
+    </script>
+
+</body>
+
+</html>
